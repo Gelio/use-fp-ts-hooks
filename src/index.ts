@@ -75,6 +75,10 @@ function getOptionEitherAwareEq(value: unknown): eq.Eq<unknown> {
  */
 export const optionEitherAwareEq: eq.Eq<unknown> = {
   equals: (x, y) => {
+    if (y === null || y === undefined) {
+      return eq.eqStrict.equals(x, y);
+    }
+
     const xEq = getOptionEitherAwareEq(x);
 
     return xEq.equals(x, y);
