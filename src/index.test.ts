@@ -75,5 +75,11 @@ describe("optionEitherAwareEq", () => {
     expect(optionEitherAwareEq.equals(option.some(1234), undefined)).toBe(
       false
     );
+    expect(
+      optionEitherAwareEq.equals(
+        option.some(option.some(1234)),
+        option.some(null)
+      )
+    ).toBe(false);
   });
 });

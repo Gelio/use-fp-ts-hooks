@@ -1,5 +1,4 @@
 import { either, eq, option } from "fp-ts";
-import { constFalse } from "fp-ts/es6/function.js";
 
 export function useFpTsEffect(callback: () => void, dependencies: unknown[]) {
   return useEqEffect(
@@ -30,10 +29,6 @@ function isObject(value: unknown): value is object {
   return typeof value === "object" && value !== null;
 }
 
-const eqNever: eq.Eq<unknown> = {
-  equals: constFalse,
-};
-
 function getOptionEitherAwareEq(value: unknown): eq.Eq<unknown> {
   if (
     isObject(value) &&
@@ -41,25 +36,15 @@ function getOptionEitherAwareEq(value: unknown): eq.Eq<unknown> {
   ) {
     {
       const maybeEitherValue = value as either.Either<unknown, unknown>;
-      if (either.isLeft(maybeEitherValue)) {
-        return either.getEq(
-          getOptionEitherAwareEq(maybeEitherValue.left),
-          eqNever
-        );
-      } else if (either.isRight(maybeEitherValue)) {
-        return either.getEq(
-          eqNever,
-          getOptionEitherAwareEq(maybeEitherValue.right)
-        );
+      if (either.isLeft(maybeEitherValue) || either.isRight(maybeEitherValue)) {
+        return either.getEq(optionEitherAwareEq, optionEitherAwareEq);
       }
     }
 
     {
       const maybeOptionValue = value as option.Option<unknown>;
-      if (option.isSome(maybeOptionValue)) {
-        return option.getEq(getOptionEitherAwareEq(maybeOptionValue.value));
-      } else if (option.isNone(maybeOptionValue)) {
-        return option.getEq(eqNever);
+      if (option.isSome(maybeOptionValue) || option.isNone(maybeOptionValue)) {
+        return option.getEq(optionEitherAwareEq);
       }
     }
   }
